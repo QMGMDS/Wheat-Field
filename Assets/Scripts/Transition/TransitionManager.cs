@@ -8,12 +8,15 @@ namespace MFarm.Transition
 {
     public class TransitionManager : MonoBehaviour
     {
-        public string startSceneName = string.Empty;
+        [SceneName] public string startSceneName = string.Empty;
+        private CanvasGroup fadeCanvasGroup;
 
+        private bool isFade; //是否进人渐入渐出动画
 
         private void Start()
         {
-            StartCoroutine(LoadSceneSetActive(startSceneName));
+            //StartCoroutine(LoadSceneSetActive(startSceneName));
+            fadeCanvasGroup = FindObjectOfType<CanvasGroup>();
         }
 
         private void OnEnable()
@@ -30,7 +33,8 @@ namespace MFarm.Transition
         //切换场景事件触发
         private void OnTransitionEvent(string sceneToGo, Vector3 positionToGo)
         {
-            StartCoroutine(Transition(sceneToGo,positionToGo));
+            if(!isFade) //这句可以不用
+                StartCoroutine(Transition(sceneToGo,positionToGo));
         }
 
         /// <summary>
@@ -41,6 +45,8 @@ namespace MFarm.Transition
         /// <returns></returns>
         private IEnumerator Transition(string sceneName,Vector3 targetPosition)
         {
+            yield return Fade(1); //场景变黑
+            
             EventHandler.CallBeforeSceneUnloadEvent();
 
             yield return SceneManager.UnloadSceneAsync(SceneManager.GetActiveScene()); //卸载当前被激活的场景
@@ -52,6 +58,8 @@ namespace MFarm.Transition
             EventHandler.CallMoveToPosition(targetPosition);
 
             EventHandler.CallAfterSceneloadedEvent();
+
+            yield return Fade(0); //场景显示出来
         }
 
         /// <summary>
@@ -68,7 +76,32 @@ namespace MFarm.Transition
         }
 
 
-        
+
+
+        /// <summary>
+        /// 淡入淡出场景
+        /// </summary>
+        /// <param name="targetAlpha">1是黑，0是透明</param>
+        /// <returns></returns>
+        private IEnumerator Fade(float targetAlpha)
+        {
+            isFade = true;
+
+            fadeCanvasGroup.blocksRaycasts = true; //鼠标射线遮挡，鼠标无法互动场景中的物体
+
+            float speed = Mathf.Abs(fadeCanvasGroup.alpha - targetAlpha) / Settings.fadeDuration; //Mathf.Abs()取绝对值
+
+            //Mathf.Approximately()比较函数，比较两个数是否相等，返回布尔值Approximately表示近似比较
+            while (!Mathf.Approximately(fadeCanvasGroup.alpha, targetAlpha))
+            {
+                //Mathf.MoveTowards()趋近函数，让fadeCanvasGroup.alpha以speed * Time.deltaTime的速度趋近targetAlpha
+                fadeCanvasGroup.alpha = Mathf.MoveTowards(fadeCanvasGroup.alpha, targetAlpha, speed * Time.deltaTime);
+                yield return null;
+            }
+
+            fadeCanvasGroup.blocksRaycasts = false;
+            isFade = false;
+        }
     }
 
 }

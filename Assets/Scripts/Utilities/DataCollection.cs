@@ -33,3 +33,33 @@ public class AnimatorType
     public PartName partName; //动画发起者（Arm，Hair）
     public AnimatorOverrideController overrideController;  //动画
 }
+
+[System.Serializable]
+public class SerializableVector3 //场景物品的坐标
+{
+    public float x,y,z;
+
+    public SerializableVector3(Vector3 pos) //序列化物品坐标
+    {
+        x = pos.x;
+        y = pos.y;
+        z = pos.z;
+    }
+
+    public Vector3 ToVector3() //读取之前物体坐标
+    {
+        return new Vector3(x,y,z);
+    }
+
+    public Vector2Int ToVector2Int()
+    {
+        return new Vector2Int((int)x, (int)y);
+    }
+}
+
+[System.Serializable]
+public class SceneItem
+{
+    public int itemID;
+    public SerializableVector3 position;
+}
