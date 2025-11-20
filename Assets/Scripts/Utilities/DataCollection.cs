@@ -63,3 +63,27 @@ public class SceneItem
     public int itemID;
     public SerializableVector3 position;
 }
+
+[System.Serializable]
+public class TileProperty
+{
+    public Vector2Int tileCoordinate;
+    public GridType gridType;
+    public bool boolTypeValue;
+}
+
+[System.Serializable]
+public class TileDetails
+{
+    public int girdX,gridY;
+    public bool canDig;
+    public bool canDropItem;
+    public bool canPlaceFurniture;
+    public bool isNPCObstacle;
+    public int daySinceDug = -1;
+    public int daySinceWatered = -1;
+    public int seedItemID = -1;
+    public int growthDays = -1;
+    public int daySinceLastHarvest = -1;
+    
+}

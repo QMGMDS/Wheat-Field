@@ -13,10 +13,11 @@ namespace MFarm.Transition
 
         private bool isFade; //是否进人渐入渐出动画
 
-        private void Start()
+        private IEnumerator Start()
         {
-            //StartCoroutine(LoadSceneSetActive(startSceneName));
             fadeCanvasGroup = FindObjectOfType<CanvasGroup>();
+            yield return LoadSceneSetActive(startSceneName);
+            EventHandler.CallAfterSceneloadedEvent();
         }
 
         private void OnEnable()
@@ -33,7 +34,7 @@ namespace MFarm.Transition
         //切换场景事件触发
         private void OnTransitionEvent(string sceneToGo, Vector3 positionToGo)
         {
-            if(!isFade) //这句可以不用
+            if(!isFade)
                 StartCoroutine(Transition(sceneToGo,positionToGo));
         }
 
@@ -45,9 +46,9 @@ namespace MFarm.Transition
         /// <returns></returns>
         private IEnumerator Transition(string sceneName,Vector3 targetPosition)
         {
-            yield return Fade(1); //场景变黑
-            
             EventHandler.CallBeforeSceneUnloadEvent();
+            
+            yield return Fade(1); //场景变黑
 
             yield return SceneManager.UnloadSceneAsync(SceneManager.GetActiveScene()); //卸载当前被激活的场景
 

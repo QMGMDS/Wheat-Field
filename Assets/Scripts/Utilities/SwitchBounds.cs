@@ -7,6 +7,7 @@ using Cinemachine;
 //获取场景中摄像机的边界
 public class SwitchBounds : MonoBehaviour
 {
+
     private void OnEnable()
     {
         EventHandler.AfterSceneloadedEvent += SwitchConfinerShape;
@@ -20,6 +21,7 @@ public class SwitchBounds : MonoBehaviour
 
     private void SwitchConfinerShape()
     {
+        // Debug.Log("触发了");
         PolygonCollider2D ConfinerShape = GameObject.FindGameObjectWithTag("BoundsConfiner").GetComponent<PolygonCollider2D>();
 
         CinemachineConfiner confiner = GetComponent<CinemachineConfiner>();

@@ -31,13 +31,13 @@ namespace MFarm.Inventory
 
         private void OnBeforeSceneUnloadEvent()
         {
-            GetAllSceneItems();
+            //GetAllSceneItems();
         }
 
         private void OnAfterSceneUnloadEvent()
         {
             itemParent = GameObject.FindWithTag("ItemParent").transform;
-            ReCreateAllItems();
+            //ReCreateAllItems();
         }
 
 
@@ -54,8 +54,8 @@ namespace MFarm.Inventory
         /// </summary>
         private void GetAllSceneItems()
         {
-            #region 找当前场景上携带Item的对象,存入列表中
-            List<SceneItem> currentSceneItem = new List<SceneItem>();
+            #region 查找已加载场景中携带Item的对象,存入列表中
+            List<SceneItem> currentSceneItems = new List<SceneItem>();
 
             foreach (var item in FindObjectsOfType<Item>())
             {
@@ -65,18 +65,19 @@ namespace MFarm.Inventory
                     position = new SerializableVector3(item.transform.position)
                 };
 
-                currentSceneItem.Add(sceneItem);
+                currentSceneItems.Add(sceneItem);
+                //Debug.Log(sceneItem.itemID);
             }
             #endregion
 
             #region 将列表存入字典中
             if (sceneItemDict.ContainsKey(SceneManager.GetActiveScene().name)) //如果当前加载的场景曾经加载过，则更新之前的场景物品数据
             {
-                sceneItemDict[SceneManager.GetActiveScene().name] = currentSceneItem;
+                sceneItemDict[SceneManager.GetActiveScene().name] = currentSceneItems;
             }
             else //如果是新场景，添加一个场景物品数据
             {
-                sceneItemDict.Add(SceneManager.GetActiveScene().name,currentSceneItem);
+                sceneItemDict.Add(SceneManager.GetActiveScene().name,currentSceneItems);
             }
             #endregion
 
@@ -87,12 +88,13 @@ namespace MFarm.Inventory
         /// </summary>
         private void ReCreateAllItems()
         {
-            List<SceneItem> currentSceneItem = new List<SceneItem>();
+            List<SceneItem> currentSceneItems = new List<SceneItem>();
 
              //字典查找当前激活的场景，TryGetValu()使得如果没有找到则返回flase,有则返回true并将key对应数据赋值给currentSceneItem
-            if(sceneItemDict.TryGetValue(SceneManager.GetActiveScene().name, out currentSceneItem))
+            if(sceneItemDict.TryGetValue(SceneManager.GetActiveScene().name, out currentSceneItems))
             {
-                if(currentSceneItem != null) //找到的数据不为空
+
+                if(currentSceneItems != null) //找到的数据不为空
                 {
                     //清场
                     foreach (var item in FindObjectsOfType<Item>())
@@ -100,10 +102,10 @@ namespace MFarm.Inventory
                         Destroy(item.gameObject);
                     }
 
-                    foreach (var item in currentSceneItem)
+                    foreach (var item in currentSceneItems)
                     {
-                        Item newItem = Instantiate(itemPrefab,item.position.ToVector3(),Quaternion.identity,itemParent);
-                        newItem.Init(item.itemID);
+                        var newItem = Instantiate(itemPrefab,item.position.ToVector3(),Quaternion.identity,itemParent);
+                        //newItem.Init(item.itemID);
                     }
                 }
             }
